@@ -1,6 +1,6 @@
 # AIEngineeringLevelOne
 
-Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
+Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with local Ollama, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
 
 ## AI Agent Test
 
@@ -10,26 +10,32 @@ Hello, world! This change was created from Jira work item SCRUM-5.
 
 - JDK 21 or newer
 - Maven 3.9 or newer
-- An OpenAI API key only when AI integration is enabled
+- Ollama running locally with the `llama3.2:3b` model
 
 ## Configuration
 
-The application starts safely without an external model by default. Copy `.env.example` into the environment configuration used by your shell or IDE; do not commit a populated `.env` file.
+Pull and start the local model before running the application:
+
+```shell
+ollama pull llama3.2:3b
+ollama serve
+```
+
+Copy `.env.example` into the environment configuration used by your shell or IDE when overriding defaults; do not commit a populated `.env` file.
 
 | Environment variable | Default | Purpose |
 | --- | --- | --- |
-| `AI_MODEL_CHAT` | `none` | Chat provider; set to `openai` to enable the model |
-| `OPENAI_API_KEY` | empty | OpenAI credential; required when AI is enabled |
-| `OPENAI_BASE_URL` | `https://api.openai.com` | OpenAI-compatible API base URL |
-| `OPENAI_CHAT_MODEL` | `gpt-4.1-mini` | Chat model name |
+| `AI_MODEL_CHAT` | `ollama` | Spring AI chat provider |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Local Ollama API URL |
+| `OLLAMA_CHAT_MODEL` | `llama3.2:3b` | Local chat model name |
+| `OLLAMA_TEMPERATURE` | `0.2` | Model response randomness |
 | `SERVER_PORT` | `8080` | HTTP port |
 | `LOG_FORMAT` | `logstash` | Spring Boot structured console format |
 
 PowerShell example:
 
 ```powershell
-$env:AI_MODEL_CHAT = "openai"
-$env:OPENAI_API_KEY = "your-api-key"
+$env:OLLAMA_CHAT_MODEL = "llama3.2:3b"
 mvn spring-boot:run
 ```
 
@@ -53,6 +59,26 @@ curl http://localhost:8080/actuator/health
 
 The response includes `{"status":"UP"}` when the service is running.
 
+Ask the local model a question:
+
+```shell
+curl -X POST http://localhost:8080/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Reply with a short greeting."}'
+```
+
+The JSON response identifies the `ollama` provider and `llama3.2:3b` model alongside the generated answer.
+
+### Maven plugin troubleshooting
+
+The Spring Boot Maven plugin prefix contains a hyphen. Use:
+
+```shell
+mvn spring-boot:run
+```
+
+Do not use `mvn springboot:run`; Maven treats `springboot` as a different plugin prefix and reports `No plugin found for prefix 'springboot'`.
+
 ## Project layout
 
 - `src/main/java/com/productsquads/aiengineering`: application source
@@ -64,4 +90,4 @@ The response includes `{"status":"UP"}` when the service is running.
 
 ## Security
 
-Credentials are read from environment variables and are never required in source files. `.gitignore` excludes `.env` files, local IDE state, build output, logs, and common private-key formats. If a secret is accidentally committed, revoke it immediately and remove it from Git history.
+Configuration overrides are read from environment variables. `.gitignore` excludes `.env` files, local IDE state, build output, logs, and common private-key formats. If a secret is accidentally committed, revoke it immediately and remove it from Git history.

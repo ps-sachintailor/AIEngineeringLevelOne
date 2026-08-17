@@ -24,8 +24,8 @@ class RagApplicationTests {
     }
 
     @Test
-    void externalAiIsDisabledByDefault() {
-        assertThat(aiModelProperties.provider()).isEqualTo("none");
-        assertThat(aiModelProperties.model()).isNotBlank();
+    void localOllamaIsConfiguredByDefault() {
+        assertThat(aiModelProperties.provider()).isEqualTo("ollama");
+        assertThat(aiModelProperties.model()).isEqualTo("llama3.2:3b");
     }
 }

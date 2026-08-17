@@ -3,19 +3,21 @@ spring:
     name: ai-engineering-level-one
   ai:
     model:
-      chat: ${AI_MODEL_CHAT:none}
+      chat: ${AI_MODEL_CHAT:ollama}
       embedding: none
-    openai:
-      api-key: ${OPENAI_API_KEY:}
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      init:
+        pull-model-strategy: never
       chat:
         options:
-          model: ${OPENAI_CHAT_MODEL:gpt-4.1-mini}
+          model: ${OLLAMA_CHAT_MODEL:llama3.2:3b}
+          temperature: ${OLLAMA_TEMPERATURE:0.2}
 
 app:
   ai:
-    provider: ${AI_MODEL_CHAT:none}
-    model: ${OPENAI_CHAT_MODEL:gpt-4.1-mini}
+    provider: ${AI_MODEL_CHAT:ollama}
+    model: ${OLLAMA_CHAT_MODEL:llama3.2:3b}
 
 server:
   port: ${SERVER_PORT:8080}

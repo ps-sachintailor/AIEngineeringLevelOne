@@ -2,11 +2,11 @@
 
 ## Scope
 
-This repository contains a Java 21 Maven application built with Spring Boot and Spring AI. Keep changes focused on the Jira acceptance criteria and preserve environment-based secret handling.
+This repository contains a Java 21 Maven application built with Spring Boot, Spring AI, and local Ollama. Keep changes focused on the Jira acceptance criteria and preserve environment-based configuration.
 
 ## Required checks
 
-Run `mvn clean verify` before committing. For runtime changes, also start the packaged application and confirm `GET /actuator/health` reports `UP`.
+Run `mvn clean verify` before committing. For runtime changes, also start the application, confirm `GET /actuator/health` reports `UP`, and exercise `POST /api/v1/chat` against the configured local model.
 
 ## Conventions
 
