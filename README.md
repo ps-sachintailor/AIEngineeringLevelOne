@@ -61,13 +61,15 @@ The response includes `{"status":"UP"}` when the service is running.
 
 Ask the local model a question:
 
-```shell
-curl -X POST http://localhost:8080/api/v1/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Reply with a short greeting."}'
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri "http://localhost:8080/api/v1/chat" `
+  -ContentType "application/json" `
+  -Body '{"message":"Reply with a short greeting."}'
 ```
 
 The JSON response identifies the `ollama` provider and `llama3.2:3b` model alongside the generated answer.
+The request body must be valid JSON and must contain a non-empty `message` field.
 
 ### Maven plugin troubleshooting
 

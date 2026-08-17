@@ -8,9 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +35,36 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 fieldErrors);
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ApiError> handleUnreadableMessage(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request) {
+        log.warn("Unreadable JSON request path={}", request.getRequestURI());
+        ApiError body = new ApiError(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Malformed JSON request. Expected: {\"message\":\"your question\"}",
+                request.getRequestURI(),
+                Map.of());
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    ResponseEntity<ApiError> handleModelConnection(
+            RestClientException exception,
+            HttpServletRequest request) {
+        log.error("Local model request failed path={}", request.getRequestURI(), exception);
+        ApiError body = new ApiError(
+                Instant.now(),
+                HttpStatus.BAD_GATEWAY.value(),
+                HttpStatus.BAD_GATEWAY.getReasonPhrase(),
+                "Local Ollama request failed. Confirm Ollama is running and the configured model is available.",
+                request.getRequestURI(),
+                Map.of());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
     }
 
     @ExceptionHandler(Exception.class)
