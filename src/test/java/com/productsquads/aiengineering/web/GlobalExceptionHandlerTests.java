@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 class GlobalExceptionHandlerTests {
 
@@ -37,6 +38,16 @@ class GlobalExceptionHandlerTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().message()).contains("Ollama");
+    }
+
+    @Test
+    void unsupportedMethodReturnsMethodNotAllowed() {
+        HttpServletRequest request = requestFor("/api/v1/chat");
+
+        ResponseEntity<ApiError> response = handler.handleUnsupportedMethod(
+                new HttpRequestMethodNotSupportedException("DELETE"), request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     private static HttpServletRequest requestFor(String path) {

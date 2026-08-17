@@ -71,6 +71,14 @@ Invoke-RestMethod -Method Post `
 The JSON response identifies the `ollama` provider and `llama3.2:3b` model alongside the generated answer.
 The request body must be valid JSON and must contain a non-empty `message` field.
 
+For a quick browser test, open:
+
+```text
+http://localhost:8080/api/v1/chat?message=Explain%20RAG%20briefly
+```
+
+Opening `http://localhost:8080/api/v1/chat` without a query parameter sends a default greeting prompt.
+
 ### Maven plugin troubleshooting
 
 The Spring Boot Maven plugin prefix contains a hyphen. Use:
