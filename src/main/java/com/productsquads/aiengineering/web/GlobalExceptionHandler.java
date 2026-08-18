@@ -1,5 +1,6 @@
 package com.productsquads.aiengineering.web;
 
+import com.productsquads.aiengineering.ask.ModelRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -68,6 +69,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
     }
 
+    @ExceptionHandler(ModelRequestException.class)
+    ResponseEntity<ApiError> handleModelRequest(
+            ModelRequestException exception,
+            HttpServletRequest request) {
+        log.error(
+                "AI model request failed path={} exceptionType={}",
+                request.getRequestURI(),
+                rootCauseType(exception));
+        ApiError body = new ApiError(
+                Instant.now(),
+                HttpStatus.BAD_GATEWAY.value(),
+                HttpStatus.BAD_GATEWAY.getReasonPhrase(),
+                "The AI service is temporarily unavailable. Please try again later.",
+                request.getRequestURI(),
+                Map.of());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     ResponseEntity<ApiError> handleUnsupportedMethod(
             HttpRequestMethodNotSupportedException exception,
@@ -93,5 +112,13 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 Map.of());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    private static String rootCauseType(Throwable throwable) {
+        Throwable rootCause = throwable;
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
+        }
+        return rootCause.getClass().getSimpleName();
     }
 }
