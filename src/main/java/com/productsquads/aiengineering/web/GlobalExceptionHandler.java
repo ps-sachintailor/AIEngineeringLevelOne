@@ -1,6 +1,7 @@
 package com.productsquads.aiengineering.web;
 
 import com.productsquads.aiengineering.ask.ModelRequestException;
+import com.productsquads.aiengineering.document.DocumentIngestionException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -82,6 +83,24 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_GATEWAY.value(),
                 HttpStatus.BAD_GATEWAY.getReasonPhrase(),
                 "The AI service is temporarily unavailable. Please try again later.",
+                request.getRequestURI(),
+                Map.of());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
+    }
+
+    @ExceptionHandler(DocumentIngestionException.class)
+    ResponseEntity<ApiError> handleDocumentIngestion(
+            DocumentIngestionException exception,
+            HttpServletRequest request) {
+        log.error(
+                "Document embedding failed path={} exceptionType={}",
+                request.getRequestURI(),
+                rootCauseType(exception));
+        ApiError body = new ApiError(
+                Instant.now(),
+                HttpStatus.BAD_GATEWAY.value(),
+                HttpStatus.BAD_GATEWAY.getReasonPhrase(),
+                "The embedding service is temporarily unavailable. Please try again later.",
                 request.getRequestURI(),
                 Map.of());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);

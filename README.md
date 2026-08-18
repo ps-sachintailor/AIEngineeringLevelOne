@@ -75,6 +75,28 @@ mvn spring-boot:run
 
 Startup validates embedding provider names, HTTP(S) endpoints, and credential presence without logging secret values. Vector data is held only in application memory and is cleared whenever the application restarts. Persistent production vector storage is outside the scope of this implementation.
 
+### Embed a document
+
+Send document text and optional metadata to the ingestion endpoint. The configured embedding provider creates the embedding and the application stores it in the in-memory vector store:
+
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri "http://localhost:8080/api/v1/documents" `
+  -ContentType "application/json" `
+  -Body '{"content":"Spring AI supports retrieval-augmented generation.","metadata":{"source":"documentation"}}'
+```
+
+A successful request returns HTTP `201 Created`:
+
+```json
+{
+  "documentId": "generated-document-id",
+  "status": "embedded"
+}
+```
+
+`content` is required and limited to 20,000 characters. `metadata` is optional and limited to 50 entries. Embedded documents remain available only until the application restarts.
+
 ## Build and test
 
 ```shell
