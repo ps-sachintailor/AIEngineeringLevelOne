@@ -13,9 +13,10 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(properties = {
         "OPENAI_BASE_URL=https://models.example.test/v1",
         "OPENAI_API_KEY=test-only-key",
-        "OPENAI_CHAT_MODEL=test-chat-model"
+        "OPENAI_CHAT_MODEL=test-chat-model",
+        "spring.autoconfigure.exclude=org.springframework.ai.vectorstore.chroma.autoconfigure.ChromaVectorStoreAutoConfiguration"
 })
-@ActiveProfiles("openai-compatible")
+@ActiveProfiles({"openai-compatible", "local-rag"})
 class OpenAiCompatibleProfileTests {
 
     @Autowired
