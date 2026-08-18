@@ -1,6 +1,6 @@
 # AIEngineeringLevelOne
 
-Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with local Ollama, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
+Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with interchangeable Ollama and OpenAI-compatible chat providers, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
 
 ## AI Agent Test
 
@@ -25,10 +25,13 @@ Copy `.env.example` into the environment configuration used by your shell or IDE
 
 | Environment variable | Default | Purpose |
 | --- | --- | --- |
-| `AI_MODEL_CHAT` | `ollama` | Spring AI chat provider |
+| `SPRING_PROFILES_ACTIVE` | `ollama` | Provider profile: `ollama` or `openai-compatible` |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Local Ollama API URL |
 | `OLLAMA_CHAT_MODEL` | `llama3.2:3b` | Local chat model name |
 | `OLLAMA_TEMPERATURE` | `0.2` | Model response randomness |
+| `OPENAI_BASE_URL` | none | OpenAI-compatible API base URL |
+| `OPENAI_API_KEY` | none | OpenAI-compatible API key |
+| `OPENAI_CHAT_MODEL` | none | OpenAI-compatible chat model name |
 | `SERVER_PORT` | `8080` | HTTP port |
 | `LOG_FORMAT` | `logstash` | Spring Boot structured console format |
 
@@ -38,6 +41,18 @@ PowerShell example:
 $env:OLLAMA_CHAT_MODEL = "llama3.2:3b"
 mvn spring-boot:run
 ```
+
+OpenAI-compatible provider example:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = "openai-compatible"
+$env:OPENAI_BASE_URL = "https://api.openai.com"
+$env:OPENAI_API_KEY = "<set-in-your-shell-or-secret-store>"
+$env:OPENAI_CHAT_MODEL = "gpt-4o-mini"
+mvn spring-boot:run
+```
+
+The OpenAI-compatible profile fails startup when its base URL, API key, or model is missing. Configuration errors name the missing setting but never log credential values.
 
 ## Build and test
 
