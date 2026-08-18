@@ -1,6 +1,6 @@
 # AIEngineeringLevelOne
 
-Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with interchangeable chat and embedding providers, Chroma vector storage, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
+Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with interchangeable chat and embedding providers, in-memory vector storage, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
 
 ## AI Agent Test
 
@@ -11,7 +11,6 @@ Hello, world! This change was created from Jira work item SCRUM-5.
 - JDK 21 or newer
 - Maven 3.9 or newer
 - Ollama running locally with the `llama3.2:3b` chat model and `nomic-embed-text` embedding model
-- ChromaDB 1.x running locally, or credentials for a Chroma Cloud instance
 
 ## Configuration
 
@@ -21,12 +20,6 @@ Pull and start the local model before running the application:
 ollama pull llama3.2:3b
 ollama pull nomic-embed-text
 ollama serve
-```
-
-Start Chroma locally in a separate terminal:
-
-```shell
-docker run --rm --name chroma -p 8000:8000 ghcr.io/chroma-core/chroma:1.0.0
 ```
 
 Copy `.env.example` into the environment configuration used by your shell or IDE when overriding defaults; do not commit a populated `.env` file.
@@ -44,14 +37,6 @@ Copy `.env.example` into the environment configuration used by your shell or IDE
 | `EMBEDDING_OPENAI_BASE_URL` | none | OpenAI-compatible embedding API base URL used by `remote-rag` |
 | `EMBEDDING_OPENAI_API_KEY` | none | OpenAI-compatible embedding API key |
 | `EMBEDDING_OPENAI_MODEL` | none | OpenAI-compatible embedding model name |
-| `CHROMA_HOST` | `http://localhost` (`local-rag`) | Chroma server host including scheme |
-| `CHROMA_PORT` | `8000` locally, `443` remotely | Chroma server port |
-| `CHROMA_KEY_TOKEN` | none | Chroma Cloud API token; never commit a populated value |
-| `CHROMA_TENANT_NAME` | `SpringAiTenant` locally | Chroma tenant; required for `remote-rag` |
-| `CHROMA_DATABASE_NAME` | `SpringAiDatabase` locally | Chroma database; required for `remote-rag` |
-| `CHROMA_COLLECTION_NAME` | `rag_documents` | Chroma collection used by the application |
-| `CHROMA_INITIALIZE_SCHEMA` | `false` | Create the configured tenant, database, and collection at startup |
-| `CHROMA_CONNECTIVITY_CHECK_ENABLED` | `false` | Call Chroma's heartbeat during startup and fail fast if unavailable |
 | `SERVER_PORT` | `8080` | HTTP port |
 | `LOG_FORMAT` | `logstash` | Spring Boot structured console format |
 
@@ -65,7 +50,7 @@ mvn spring-boot:run
 OpenAI-compatible provider example:
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE = "openai-compatible"
+$env:SPRING_PROFILES_ACTIVE = "openai-compatible,local-rag"
 $env:OPENAI_BASE_URL = "https://api.openai.com"
 $env:OPENAI_API_KEY = "<set-in-your-shell-or-secret-store>"
 $env:OPENAI_CHAT_MODEL = "gpt-4o-mini"
@@ -74,33 +59,21 @@ mvn spring-boot:run
 
 The OpenAI-compatible profile fails startup when its base URL, API key, or model is missing. Configuration errors name the missing setting but never log credential values.
 
-### RAG profiles and connectivity
+### RAG profiles
 
-Use `local-rag` with Ollama embeddings and a local Chroma instance. Set `CHROMA_INITIALIZE_SCHEMA=true` on the first run if the configured collection does not exist. The embedding profile is independent of the chat profile, so `ollama,remote-rag` and `openai-compatible,local-rag` are also supported combinations.
+Both RAG profiles use Spring AI's in-process `SimpleVectorStore`; no Docker container or external vector database is required. Use `local-rag` for Ollama embeddings or `remote-rag` for an OpenAI-compatible embedding API. The embedding profile is independent of the chat profile, so `ollama,remote-rag` and `openai-compatible,local-rag` are supported combinations.
 
-For Chroma Cloud and an OpenAI-compatible embedding API, activate `remote-rag` and supply all remote values through the environment or a secret store:
+For an OpenAI-compatible embedding API, activate `remote-rag` and supply its values through the environment or a secret store:
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE = "ollama,remote-rag"
-$env:CHROMA_HOST = "https://api.trychroma.com"
-$env:CHROMA_PORT = "443"
-$env:CHROMA_KEY_TOKEN = "<set-in-your-shell-or-secret-store>"
-$env:CHROMA_TENANT_NAME = "<tenant>"
-$env:CHROMA_DATABASE_NAME = "<database>"
 $env:EMBEDDING_OPENAI_BASE_URL = "https://api.openai.com"
 $env:EMBEDDING_OPENAI_API_KEY = "<set-in-your-shell-or-secret-store>"
 $env:EMBEDDING_OPENAI_MODEL = "text-embedding-3-small"
 mvn spring-boot:run
 ```
 
-Startup always validates provider names, HTTP(S) endpoints, required cloud identifiers, and credential presence without logging secret values. To perform the testable Chroma heartbeat during startup, enable the check before launching:
-
-```powershell
-$env:CHROMA_CONNECTIVITY_CHECK_ENABLED = "true"
-mvn spring-boot:run
-```
-
-The application calls `GET /api/v2/heartbeat` on the configured Chroma host and port and fails startup with a sanitized error if the service is unavailable.
+Startup validates embedding provider names, HTTP(S) endpoints, and credential presence without logging secret values. Vector data is held only in application memory and is cleared whenever the application restarts. Persistent production vector storage is outside the scope of this implementation.
 
 ## Build and test
 

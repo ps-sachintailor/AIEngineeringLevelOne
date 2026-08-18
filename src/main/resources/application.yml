@@ -82,25 +82,9 @@ spring:
     ollama:
       embedding:
         model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
-    vectorstore:
-      chroma:
-        client:
-          host: ${CHROMA_HOST:http://localhost}
-          port: ${CHROMA_PORT:8000}
-        tenant-name: ${CHROMA_TENANT_NAME:SpringAiTenant}
-        database-name: ${CHROMA_DATABASE_NAME:SpringAiDatabase}
-        collection-name: ${CHROMA_COLLECTION_NAME:rag_documents}
-        initialize-schema: ${CHROMA_INITIALIZE_SCHEMA:false}
 
 app:
   rag:
-    chroma:
-      mode: local
-      host: ${CHROMA_HOST:http://localhost}
-      port: ${CHROMA_PORT:8000}
-      collection-name: ${CHROMA_COLLECTION_NAME:rag_documents}
-      initialize-schema: ${CHROMA_INITIALIZE_SCHEMA:false}
-      check-on-startup: ${CHROMA_CONNECTIVITY_CHECK_ENABLED:false}
     embedding:
       provider: ollama
       model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
@@ -119,26 +103,9 @@ spring:
         base-url: ${EMBEDDING_OPENAI_BASE_URL}
         api-key: ${EMBEDDING_OPENAI_API_KEY}
         model: ${EMBEDDING_OPENAI_MODEL}
-    vectorstore:
-      chroma:
-        client:
-          host: ${CHROMA_HOST}
-          port: ${CHROMA_PORT:443}
-          key-token: ${CHROMA_KEY_TOKEN}
-        tenant-name: ${CHROMA_TENANT_NAME}
-        database-name: ${CHROMA_DATABASE_NAME}
-        collection-name: ${CHROMA_COLLECTION_NAME:rag_documents}
-        initialize-schema: ${CHROMA_INITIALIZE_SCHEMA:false}
 
 app:
   rag:
-    chroma:
-      mode: cloud
-      host: ${CHROMA_HOST}
-      port: ${CHROMA_PORT:443}
-      collection-name: ${CHROMA_COLLECTION_NAME:rag_documents}
-      initialize-schema: ${CHROMA_INITIALIZE_SCHEMA:false}
-      check-on-startup: ${CHROMA_CONNECTIVITY_CHECK_ENABLED:false}
     embedding:
       provider: openai-compatible
       model: ${EMBEDDING_OPENAI_MODEL}

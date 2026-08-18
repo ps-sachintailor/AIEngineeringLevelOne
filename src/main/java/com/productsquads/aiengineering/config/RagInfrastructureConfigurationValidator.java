@@ -9,38 +9,14 @@ import org.springframework.util.StringUtils;
 @Component
 public class RagInfrastructureConfigurationValidator {
 
-    private static final String CLOUD = "cloud";
     private static final String OPENAI_COMPATIBLE = "openai-compatible";
-    private static final Set<String> SUPPORTED_CHROMA_MODES = Set.of("local", CLOUD);
     private static final Set<String> SUPPORTED_EMBEDDING_PROVIDERS =
             Set.of("ollama", OPENAI_COMPATIBLE);
 
     public RagInfrastructureConfigurationValidator(
             RagInfrastructureProperties properties,
             Environment environment) {
-        validateChroma(properties.chroma(), environment);
         validateEmbedding(properties.embedding(), environment);
-    }
-
-    private static void validateChroma(
-            RagInfrastructureProperties.Chroma chroma,
-            Environment environment) {
-        if (!SUPPORTED_CHROMA_MODES.contains(chroma.mode())) {
-            throw new IllegalStateException("Unsupported Chroma mode. Use local or cloud");
-        }
-        validateHttpUrl(chroma.host(), "Chroma host must be a valid HTTP(S) URL");
-
-        if (CLOUD.equals(chroma.mode())) {
-            requireConfigured(
-                    environment.getProperty("spring.ai.vectorstore.chroma.client.key-token"),
-                    "Chroma Cloud key token is required");
-            requireConfigured(
-                    environment.getProperty("spring.ai.vectorstore.chroma.tenant-name"),
-                    "Chroma Cloud tenant name is required");
-            requireConfigured(
-                    environment.getProperty("spring.ai.vectorstore.chroma.database-name"),
-                    "Chroma Cloud database name is required");
-        }
     }
 
     private static void validateEmbedding(

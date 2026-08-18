@@ -14,38 +14,18 @@ class RagInfrastructureConfigurationValidatorTests {
     private final Environment environment = mock(Environment.class);
 
     @Test
-    void acceptsLocalChromaAndOllamaEmbeddingsWithoutCredentials() {
+    void acceptsOllamaEmbeddingsWithoutCredentials() {
         RagInfrastructureProperties properties = properties(
-                "local",
-                URI.create("http://localhost"),
-                "ollama",
-                URI.create("http://localhost:11434"));
+                "ollama", URI.create("http://localhost:11434"));
 
         assertThatCode(() -> new RagInfrastructureConfigurationValidator(properties, environment))
                 .doesNotThrowAnyException();
     }
 
     @Test
-    void requiresChromaCloudCredentialsWithoutExposingAValue() {
+    void requiresOpenAiCompatibleEmbeddingApiKeyWithoutExposingAValue() {
         RagInfrastructureProperties properties = properties(
-                "cloud",
-                URI.create("https://api.trychroma.com"),
-                "openai-compatible",
-                URI.create("https://models.example.test/v1"));
-
-        assertThatThrownBy(() -> new RagInfrastructureConfigurationValidator(properties, environment))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Chroma Cloud key token is required");
-    }
-
-    @Test
-    void requiresOpenAiCompatibleEmbeddingApiKey() {
-        configureChromaCloud();
-        RagInfrastructureProperties properties = properties(
-                "cloud",
-                URI.create("https://api.trychroma.com"),
-                "openai-compatible",
-                URI.create("https://models.example.test/v1"));
+                "openai-compatible", URI.create("https://models.example.test/v1"));
 
         assertThatThrownBy(() -> new RagInfrastructureConfigurationValidator(properties, environment))
                 .isInstanceOf(IllegalStateException.class)
@@ -53,58 +33,41 @@ class RagInfrastructureConfigurationValidatorTests {
     }
 
     @Test
-    void acceptsCompleteRemoteConfiguration() {
-        configureChromaCloud();
+    void acceptsCompleteOpenAiCompatibleEmbeddingConfiguration() {
         when(environment.getProperty("spring.ai.openai.embedding.api-key"))
                 .thenReturn("test-only-embedding-key");
         RagInfrastructureProperties properties = properties(
-                "cloud",
-                URI.create("https://api.trychroma.com"),
-                "openai-compatible",
-                URI.create("https://models.example.test/v1"));
+                "openai-compatible", URI.create("https://models.example.test/v1"));
 
         assertThatCode(() -> new RagInfrastructureConfigurationValidator(properties, environment))
                 .doesNotThrowAnyException();
     }
 
     @Test
-    void rejectsNonHttpChromaHost() {
+    void rejectsNonHttpEmbeddingBaseUrl() {
         RagInfrastructureProperties properties = properties(
-                "local",
-                URI.create("file:///tmp/chroma"),
-                "ollama",
-                URI.create("http://localhost:11434"));
+                "ollama", URI.create("file:///tmp/embeddings"));
 
         assertThatThrownBy(() -> new RagInfrastructureConfigurationValidator(properties, environment))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Chroma host must be a valid HTTP(S) URL");
+                .hasMessage("Embedding provider base URL must be a valid HTTP(S) URL");
     }
 
-    private void configureChromaCloud() {
-        when(environment.getProperty("spring.ai.vectorstore.chroma.client.key-token"))
-                .thenReturn("test-only-chroma-key");
-        when(environment.getProperty("spring.ai.vectorstore.chroma.tenant-name"))
-                .thenReturn("test-tenant");
-        when(environment.getProperty("spring.ai.vectorstore.chroma.database-name"))
-                .thenReturn("test-database");
+    @Test
+    void rejectsUnsupportedEmbeddingProvider() {
+        RagInfrastructureProperties properties = properties(
+                "unsupported", URI.create("https://models.example.test/v1"));
+
+        assertThatThrownBy(() -> new RagInfrastructureConfigurationValidator(properties, environment))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unsupported embedding provider. Use ollama or openai-compatible");
     }
 
-    private static RagInfrastructureProperties properties(
-            String chromaMode,
-            URI chromaHost,
-            String embeddingProvider,
-            URI embeddingBaseUrl) {
+    private static RagInfrastructureProperties properties(String provider, URI baseUrl) {
         return new RagInfrastructureProperties(
-                new RagInfrastructureProperties.Chroma(
-                        chromaMode,
-                        chromaHost,
-                        8000,
-                        "test-collection",
-                        false,
-                        false),
                 new RagInfrastructureProperties.Embedding(
-                        embeddingProvider,
+                        provider,
                         "test-embedding-model",
-                        embeddingBaseUrl));
+                        baseUrl));
     }
 }
