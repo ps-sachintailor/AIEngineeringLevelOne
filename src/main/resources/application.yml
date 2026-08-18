@@ -2,7 +2,7 @@ spring:
   application:
     name: ai-engineering-level-one
   profiles:
-    default: ollama
+    default: ollama,local-rag
   ai:
     model:
       embedding: none
@@ -70,3 +70,43 @@ app:
     provider: openai-compatible
     model: ${OPENAI_CHAT_MODEL}
     base-url: ${OPENAI_BASE_URL}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local-rag
+  ai:
+    model:
+      embedding: ollama
+    ollama:
+      embedding:
+        model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+
+app:
+  rag:
+    embedding:
+      provider: ollama
+      model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: remote-rag
+  ai:
+    model:
+      embedding: openai
+    openai:
+      embedding:
+        base-url: ${EMBEDDING_OPENAI_BASE_URL}
+        api-key: ${EMBEDDING_OPENAI_API_KEY}
+        model: ${EMBEDDING_OPENAI_MODEL}
+
+app:
+  rag:
+    embedding:
+      provider: openai-compatible
+      model: ${EMBEDDING_OPENAI_MODEL}
+      base-url: ${EMBEDDING_OPENAI_BASE_URL}

@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
         "OPENAI_API_KEY=test-only-key",
         "OPENAI_CHAT_MODEL=test-chat-model"
 })
-@ActiveProfiles("openai-compatible")
+@ActiveProfiles({"openai-compatible", "local-rag"})
 class OpenAiCompatibleProfileTests {
 
     @Autowired
