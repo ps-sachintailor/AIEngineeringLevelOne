@@ -7,5 +7,6 @@
 - `POST /api/v1/documents` accepts required document `content` plus optional `metadata`, embeds it with the active provider, and returns the generated document ID with HTTP 201.
 - The application exposes `POST /api/v1/chat` as the initial validated Spring AI integration endpoint.
 - The user-facing question API is `POST /ask` with `{"question":"..."}` and an `{"answer":"..."}` response; provider failures return a sanitized HTTP 502 error.
+- The `/ask` flow performs vector similarity search first (top three documents), then supplies the retrieved text to the chat model as grounding context.
 - Actuator health is exposed at `/actuator/health`; other actuator endpoints remain unexposed by default.
 - Console logs use Spring Boot's built-in Logstash JSON structured format unless `LOG_FORMAT` overrides it.

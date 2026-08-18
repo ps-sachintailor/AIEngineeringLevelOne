@@ -128,6 +128,8 @@ Invoke-RestMethod -Method Post `
 
 The JSON response contains a non-empty generated `answer`. The request body must be valid JSON and must contain a non-empty `question` field of at most 4,000 characters. Model-provider failures return a controlled HTTP 502 response without exposing provider details.
 
+Before generating an `/ask` response, the application embeds the question, searches the in-memory vector store for up to three similar documents, and supplies their text to the chat model as grounding context. Ingest documents through `POST /api/v1/documents` before asking related questions. When no documents are available, the prompt directs the model to report that the available documents do not provide the answer.
+
 The original `/api/v1/chat` endpoint remains available for provider and model diagnostics.
 
 For a quick browser test, open:
