@@ -63,13 +63,14 @@ Ask the local model a question:
 
 ```powershell
 Invoke-RestMethod -Method Post `
-  -Uri "http://localhost:8080/api/v1/chat" `
+  -Uri "http://localhost:8080/ask" `
   -ContentType "application/json" `
-  -Body '{"message":"Reply with a short greeting."}'
+  -Body '{"question":"Reply with a short greeting."}'
 ```
 
-The JSON response identifies the `ollama` provider and `llama3.2:3b` model alongside the generated answer.
-The request body must be valid JSON and must contain a non-empty `message` field.
+The JSON response contains a non-empty generated `answer`. The request body must be valid JSON and must contain a non-empty `question` field of at most 4,000 characters. Model-provider failures return a controlled HTTP 502 response without exposing provider details.
+
+The original `/api/v1/chat` endpoint remains available for provider and model diagnostics.
 
 For a quick browser test, open:
 
