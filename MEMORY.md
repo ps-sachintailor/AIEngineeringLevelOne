@@ -8,5 +8,6 @@
 - The application exposes `POST /api/v1/chat` as the initial validated Spring AI integration endpoint.
 - The user-facing question API is `POST /ask` with `{"question":"..."}` and an `{"answer":"..."}` response; provider failures return a sanitized HTTP 502 error.
 - The `/ask` flow performs vector similarity search first (top three documents), then supplies the retrieved text to the chat model as grounding context.
+- The default home page is a simple Svelte 5 interface with separate tabs for direct chat, document embedding, and grounded questions; Maven builds it with Vite into the Spring Boot JAR.
 - Actuator health is exposed at `/actuator/health`; other actuator endpoints remain unexposed by default.
 - Console logs use Spring Boot's built-in Logstash JSON structured format unless `LOG_FORMAT` overrides it.

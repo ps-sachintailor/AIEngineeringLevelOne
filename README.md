@@ -1,5 +1,6 @@
 # AIEngineeringLevelOne
 
+Spring Boot and Svelte 5 foundation for the Level One retrieval-augmented generation (RAG) application. The project includes a three-tab web interface, Spring Web, Spring AI with interchangeable chat and embedding providers, in-memory vector storage, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
 Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with interchangeable chat and embedding providers, in-memory vector storage, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
 
 ## AI Agent Test
@@ -10,6 +11,7 @@ Hello, world! This change was created from Jira work item SCRUM-5.
 
 - JDK 21 or newer
 - Maven 3.9 or newer
+- Node.js 22.12 or newer with npm
 - Ollama running locally with the `llama3.2:3b` chat model and `nomic-embed-text` embedding model
 
 ## Configuration
@@ -103,11 +105,31 @@ A successful request returns HTTP `201 Created`:
 mvn clean verify
 ```
 
+The Maven build runs `npm ci` and the Svelte production build automatically, then packages the generated frontend assets into the Spring Boot JAR.
+
+### Frontend development
+
+For Svelte-only development, start Spring Boot on port 8080 and run Vite in another terminal:
+
+```shell
+cd frontend
+npm install
+npm run dev
+```
+
+Vite serves the UI on `http://localhost:5173` and proxies `/api`, `/ask`, and `/actuator` to Spring Boot.
+
 ## Start the application
 
 ```shell
 mvn spring-boot:run
 ```
+
+Open `http://localhost:8080/` for the Svelte home page. Its three tabs call:
+
+- `POST /api/v1/chat` for direct chat-model diagnostics
+- `POST /api/v1/documents` for document embedding and in-memory storage
+- `POST /ask` for similarity retrieval followed by a grounded model response
 
 Confirm that the service is healthy:
 
@@ -155,6 +177,7 @@ Do not use `mvn springboot:run`; Maven treats `springboot` as a different plugin
 - `src/main/java/com/productsquads/aiengineering`: application source
 - `src/main/resources/application.yml`: environment mappings and operational defaults
 - `src/test`: automated application and configuration tests
+- `frontend`: Svelte 5 source, Vite configuration, and pinned npm dependencies
 - `AGENTS.md`: repository guidance for coding agents
 - `SKILL.md`: repeatable development workflow
 - `MEMORY.md`: durable project decisions
