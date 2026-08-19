@@ -3,15 +3,18 @@ package com.productsquads.aiengineering.document;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
 
 @Service
 public class DocumentIngestionService {
 
-    private final VectorStore vectorStore;
+    private final SimpleVectorStore vectorStore; 
 
-    public DocumentIngestionService(VectorStore vectorStore) {
+
+    public DocumentIngestionService(SimpleVectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 
@@ -23,6 +26,8 @@ public class DocumentIngestionService {
 
         try {
             vectorStore.add(List.of(document));
+            vectorStore.save(new File("src/main/resources/vector-store.json")); 
+    
         } catch (RuntimeException exception) {
             throw new DocumentIngestionException(exception);
         }

@@ -27,7 +27,7 @@ class LocalRagProfileTests {
     @Test
     void createsLocalOllamaEmbeddingAndInMemoryVectorStore() {
         assertThat(properties.embedding().provider()).isEqualTo("ollama");
-        assertThat(properties.embedding().model()).isEqualTo("nomic-embed-text");
+        assertThat(properties.embedding().model()).isEqualTo("mxbai-embed-large:335m");
         assertThat(embeddingModel.getClass().getSimpleName()).contains("Ollama");
         assertThat(vectorStore).isInstanceOf(SimpleVectorStore.class);
     }
