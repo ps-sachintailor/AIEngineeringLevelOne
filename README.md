@@ -1,6 +1,7 @@
 # AIEngineeringLevelOne
 
 Spring Boot and Svelte 5 foundation for the Level One retrieval-augmented generation (RAG) application. The project includes a three-tab web interface, Spring Web, Spring AI with interchangeable chat and embedding providers, in-memory vector storage, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
+Spring Boot foundation for the Level One retrieval-augmented generation (RAG) application. The project includes Spring Web, Spring AI with interchangeable chat and embedding providers, in-memory vector storage, Bean Validation, Actuator health checks, centralized API error handling, JSON structured logging, and environment-driven model configuration.
 
 ## AI Agent Test
 
