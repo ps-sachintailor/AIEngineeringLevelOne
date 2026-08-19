@@ -12,11 +12,11 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 
 class DocumentIngestionServiceTests {
 
-    private final VectorStore vectorStore = mock(VectorStore.class);
+    private final SimpleVectorStore vectorStore = mock(SimpleVectorStore.class);
     private final DocumentIngestionService service = new DocumentIngestionService(vectorStore);
 
     @Test

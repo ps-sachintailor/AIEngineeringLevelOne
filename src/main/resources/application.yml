@@ -79,17 +79,19 @@ spring:
   ai:
     model:
       embedding: ollama
+    # Chroma configurations are removed from here
     ollama:
       embedding:
-        model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+        model: ${OLLAMA_EMBEDDING_MODEL:mxbai-embed-large}
 
 app:
   rag:
     embedding:
       provider: ollama
-      model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+      model: ${OLLAMA_EMBEDDING_MODEL:mxbai-embed-large}
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
-
+    vectorstore:
+      provider: file-system # Updated provider tag
 ---
 spring:
   config:
@@ -110,3 +112,5 @@ app:
       provider: openai-compatible
       model: ${EMBEDDING_OPENAI_MODEL}
       base-url: ${EMBEDDING_OPENAI_BASE_URL}
+
+ 

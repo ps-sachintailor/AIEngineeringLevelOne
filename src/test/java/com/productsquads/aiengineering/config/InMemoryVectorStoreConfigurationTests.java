@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.Embedding;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -20,6 +22,11 @@ class InMemoryVectorStoreConfigurationTests {
     private final InMemoryVectorStoreConfiguration configuration =
             new InMemoryVectorStoreConfiguration();
 
+    InMemoryVectorStoreConfigurationTests() {
+        ReflectionTestUtils.setField(configuration, "resourceFile",
+                new ClassPathResource("missing-vector-store.json"));
+    }
+
     @Test
     void storesDocumentsAndReturnsTheMostSimilarDocumentInMemory() {
         VectorStore vectorStore = configuration.vectorStore(new DeterministicEmbeddingModel());
@@ -30,6 +37,7 @@ class InMemoryVectorStoreConfigurationTests {
         List<Document> results = vectorStore.similaritySearch(SearchRequest.builder()
                 .query("Spring framework AI")
                 .topK(1)
+            .similarityThreshold(0.1)
                 .build());
 
         assertThat(vectorStore).isInstanceOf(SimpleVectorStore.class);
